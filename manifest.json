@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "Code to Chat",
+  "version": "0.1.0",
+  "description": "Solve a small coding challenge before you can use AI chat sites.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://ce.judge0.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://chatgpt.com/*",
+        "*://chat.openai.com/*",
+        "*://gemini.google.com/*",
+        "*://claude.ai/*",
+        "*://copilot.microsoft.com/*",
+        "*://www.perplexity.ai/*",
+        "*://grok.com/*",
+        "*://chat.deepseek.com/*",
+        "*://poe.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "challenge.html"
+      ],
+      "matches": [
+        "*://chatgpt.com/*",
+        "*://chat.openai.com/*",
+        "*://gemini.google.com/*",
+        "*://claude.ai/*",
+        "*://copilot.microsoft.com/*",
+        "*://www.perplexity.ai/*",
+        "*://grok.com/*",
+        "*://chat.deepseek.com/*",
+        "*://poe.com/*"
+      ]
+    }
+  ],
+  "sandbox": {
+    "pages": [
+      "sandbox.html"
+    ]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
+    "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-inline' 'unsafe-eval'; worker-src 'self' blob:"
+  }
+}

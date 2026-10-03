@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Code to Chat</title>
+<style>
+  :root { color-scheme: light dark; --bg:#ffffff; --text:#111111; --dim:#737373; --line:#e4e4e4; --btn:#111111; --btn-text:#ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0c0c0c; --text:#ededed; --dim:#8a8a8a; --line:#262626; --btn:#ededed; --btn-text:#0c0c0c; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body { font: 15px/1.55 "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { max-width: 880px; margin: 0 auto; padding: 44px 24px 56px; display: flex; flex-direction: column; gap: 20px; }
+
+  body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  textarea { -webkit-user-select: text; user-select: text; }
+  img, svg { -webkit-user-drag: none; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .brand svg { width: 30px; height: 30px; flex: none; }
+
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+  h1 { margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .meta { margin: 4px 0 0; color: var(--dim); font-size: 14px; }
+  .lang { color: var(--dim); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  select { font: inherit; color: var(--text); background: transparent; border: 0; border-bottom: 1px solid var(--text); padding: 4px 18px 4px 0; border-radius: 0; cursor: pointer; }
+  select option { background: var(--bg); color: var(--text); }
+  .prompt { margin: 0; max-width: 68ch; }
+
+  /* Editor: VS Code Dark+ look */
+  .editor { background: #1e1e1e; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+  .tabs { background: #252526; height: 36px; display: flex; align-items: stretch; }
+  .tab { background: #1e1e1e; color: #d4d4d4; font: 13px/36px Consolas, "Cascadia Mono", Menlo, monospace; padding: 0 16px; border-top: 1px solid #569cd6; }
+  .body { display: flex; height: clamp(300px, 44vh, 500px); }
+  .gutter { width: 52px; flex: none; overflow: hidden; background: #1e1e1e; color: #6e7681; text-align: right; user-select: none; padding-top: 12px; }
+  .pane { position: relative; flex: 1; overflow: hidden; }
+  pre, textarea { margin: 0; padding: 12px 16px 24px 12px; border: 0; font: 14px/21px Consolas, "Cascadia Mono", Menlo, "DejaVu Sans Mono", monospace; letter-spacing: 0; tab-size: 4; white-space: pre; font-variant-ligatures: none; }
+  pre { position: absolute; top: 0; left: 0; pointer-events: none; color: #d4d4d4; min-width: 100%; }
+  textarea { position: absolute; inset: 0; width: 100%; height: 100%; resize: none; overflow: auto; background: transparent; color: transparent; -webkit-text-fill-color: transparent; caret-color: #f0f0f0; outline: 0; scrollbar-color: #424242 #1e1e1e; }
+  textarea::selection { background: #264f78; }
+  .gutter .n, pre .l { height: 21px; }
+  .gutter .n { padding-right: 14px; font: 14px/21px Consolas, "Cascadia Mono", Menlo, monospace; }
+  .n.err { color: #f14c4c; font-weight: 700; }
+  pre .l.err { background: rgba(241, 76, 76, .16); box-shadow: inset 2px 0 0 #f14c4c; }
+  .t-cm { color: #6a9955; } .t-st { color: #ce9178; } .t-pp, .t-ctl { color: #c586c0; } .t-nu { color: #b5cea8; }
+  .t-kw { color: #569cd6; } .t-type { color: #4ec9b0; } .t-fn { color: #dcdcaa; } .t-var { color: #9cdcfe; } .t-op { color: #d4d4d4; }
+
+  footer { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .status { color: var(--dim); font-size: 14px; white-space: pre-wrap; min-height: 22px; flex: 1; font-family: inherit; }
+  .status.ok { color: var(--text); font-weight: 600; }
+  .run { font: inherit; font-weight: 600; background: var(--btn); color: var(--btn-text); border: 0; border-radius: 4px; padding: 10px 18px; cursor: pointer; white-space: nowrap; }
+  .run kbd { font: 12px Consolas, Menlo, monospace; opacity: .6; margin-left: 8px; }
+  .run:disabled { opacity: .4; cursor: wait; }
+  .run:focus-visible, select:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font: 13px/1.5 Consolas, Menlo, monospace; word-break: break-word; }
+  li .mark { flex: none; width: 14px; }
+  li.pass { color: var(--dim); }
+  li.fail { color: var(--text); font-weight: 600; }
+  @media (max-width: 560px) { header { flex-direction: column; align-items: flex-start; } footer { flex-direction: column; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand" aria-label="Code to Chat">
+    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M6 3h20a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H15l-6 6v-6H6a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z"/>
+      <polyline points="12 9 8 13 12 17"/>
+      <polyline points="20 9 24 13 20 17"/>
+      <line x1="17.5" y1="8" x2="14.5" y2="18"/>
+    </svg>
+    <span>Code to Chat</span>
+  </div>
+  <header>
+    <div>
+      <h1 id="title"></h1>
+      <p class="meta">Solve it to unlock the site.</p>
+    </div>
+    <label class="lang">Language <select id="lang"></select></label>
+  </header>
+
+  <p class="prompt" id="prompt"></p>
+
+  <section class="editor">
+    <div class="tabs"><span class="tab" id="tab">solution.js</span></div>
+    <div class="body">
+      <div class="gutter"><div id="gutter"></div></div>
+      <div class="pane">
+        <pre id="hl" aria-hidden="true"></pre>
+        <textarea id="code" spellcheck="false" wrap="off" autocomplete="off" autocapitalize="off" aria-label="Code editor"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="status" id="status" role="status"></div>
+    <button class="run" id="run">Run tests<kbd>Ctrl+Enter</kbd></button>
+  </footer>
+  <ul id="results"></ul>
+</main>
+<script src="config.js"></script>
+<script src="challenges.js"></script>
+<script src="highlight.js"></script>
+<script src="challenge.js"></script>
+</body>
+</html>
