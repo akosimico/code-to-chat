@@ -1,64 +1,356 @@
 # Code to Chat
 
-Pops a full-screen coding challenge over AI chat sites (ChatGPT, Gemini, Claude, Copilot, Perplexity, Grok, DeepSeek, Poe). The page can't be used until all tests pass.
+> Practice coding before going back to AI.
 
-<img src="assets/code-to-chat.gif" width="500" alt="Code To Chat GIF">
+**Code to Chat** is an open-source browser extension that occasionally interrupts AI chat sites with a full-screen coding challenge.
 
+To continue using the AI site, you need to solve the challenge and pass all tests.
 
-## Install (Chrome, Edge, Brave, Opera)
+It currently supports:
 
-1. Open the extensions page: `chrome://extensions`, `edge://extensions`, `brave://extensions` or `opera://extensions`.
-2. Turn on **Developer mode**.
-3. Click **Load unpacked** and pick this `code-to-chat` folder.
+- ChatGPT
+- Claude
+- Gemini
+- Microsoft Copilot
+- Perplexity
+- Grok
+- DeepSeek
+- Poe
 
-## Python and JavaScript offline (optional)
+<img src="assets/code-to-chat.gif" width="600" alt="Code to Chat Demo">
 
-JavaScript and Python run locally when possible. If the local runner is unavailable (no Pyodide folder for Python, or the browser blocks the local JavaScript sandbox), the extension automatically uses the online Judge0 runner instead, so both languages still work with internet.
+## Features
 
-To make Python run offline:
+- Full-screen coding challenges on supported AI websites
+- JavaScript and Python local execution when available
+- C, C++, C#, and Java support through Judge0
+- Automatic test validation
+- Persistent unsolved challenges
+- Random challenge scheduling
+- Configurable cooldowns and trigger chances
+- VS Code-style syntax highlighting
+- Compilation and runtime error feedback
+- Copy/paste protection during challenges
+- Optional offline Python execution with Pyodide
+- Easy-to-add challenges and AI websites
+- Free and open source
 
-1. Download a Pyodide release from https://github.com/pyodide/pyodide/releases (the `pyodide-<version>.tar.bz2` file).
-2. Extract it and copy the contents into a folder named `pyodide` inside `code-to-chat`, so that `code-to-chat/pyodide/pyodide.js` exists (along with `pyodide.asm.js`, `pyodide.asm.wasm`, `python_stdlib.zip` and `pyodide-lock.json`).
-3. Reload the extension.
+## Installation
 
-## After reloading the extension
+Code to Chat is currently distributed through GitHub and is **not available on browser extension stores**.
 
-Tabs that were already open do not get the new code until you refresh them (Ctrl+R). A tab opened after the reload works straight away.
+### Chrome, Edge, Brave, and Opera
 
-## Unsolved challenges come back
+Clone the repository:
 
-When a challenge pops up, the extension records it as pending. If you close the tab (or the whole browser) without passing the tests, the same challenge appears again the next time you open any AI site, immediately and with no random chance. It is cleared only when every test passes. Solving it in one tab unlocks your other open AI tabs too.
+```bash
+git clone https://github.com/akosimico/code-to-chat.git
+```
 
-## C, C++, C# and Java
+Or download the repository as a ZIP from GitHub and extract it.
 
-These run on a remote Judge0 server (`config.js`), so they need internet and your code is sent to that server. They use stdin/stdout: read input, print the answer. The public server is free but rate limited. To self-host, change `JUDGE0_URL` in `config.js` and add the same origin to `host_permissions` in `manifest.json`.
+Then:
 
-## Tune the randomness
+1. Open your browser's extensions page:
 
-Edit the `CFG` block at the top of `content.js`:
+```text
+Chrome: chrome://extensions
+Edge:   edge://extensions
+Brave:  brave://extensions
+Opera:  opera://extensions
+```
 
-- `testMode`: while `true`, a challenge appears on every visit and there is no cooldown. Set it to `false` for real use.
-- `chanceOnLoad`: chance of a challenge when you open the site or type its address
-- `chanceOnReturn`: chance of a challenge when you switch back to an already-open tab
-- `loadDelaySec`: random delay before it appears
-- `recurMin`: random minutes between challenges while you stay on the site
-- `graceOptionsMin`: after each solve, the quiet time is picked at random from this list (default 3, 5, 10, 15, 20, 30, 45 or 60 minutes)
+2. Enable **Developer mode**.
+3. Click **Load unpacked**.
+4. Select the `code-to-chat` folder.
+5. Open one of the supported AI websites.
 
-## The editor
+Code to Chat should now be active.
 
-The code box shows line numbers and VS Code style colours (keywords, strings, comments, numbers, functions, types and constructors, variables). When code fails to compile or crashes, the offending line number is marked in red. Line numbers for JavaScript syntax errors are not available (the browser doesn't report them); other errors are.
+> After updating or reloading the extension, refresh any AI tabs that were already open.
 
-## No copy and paste
+## How It Works
 
-On the challenge page, copy, cut and paste are blocked everywhere: keyboard shortcuts (Ctrl/Cmd+C, V, X, Ctrl+Insert, Shift+Insert, Shift+Delete), the right-click menu, drag and drop, and middle-click paste. The page text can't be selected either, so the question can't be copied out. This stops casual cheating, but it can't stop someone retyping the question elsewhere or using OS-level tools.
+While you're using a supported AI website, Code to Chat can randomly trigger a coding challenge.
 
-## Add challenges or sites
+When a challenge appears, it covers the AI page with a coding environment.
 
-- Challenges: add an entry to `CHALLENGES` in `challenges.js` (one `mk(...)` line: function form with tests, plus an `io` form with a prompt and input/output tests for C, C++, C# and Java). A new challenge is picked at random and is never the same as the previous one.
-- Sites: add a URL pattern to both `matches` lists in `manifest.json`.
+Write your solution and run the tests.
 
-## Known limits
+**Pass every test → AI unlocked.**
 
-- It locks the page, not the browser. Someone can still close the tab, switch tabs, or disable the extension.
-- Firefox is not supported yet: it has no `sandbox` manifest key, so the JavaScript runner needs a different approach.
-- Only lightly tested in a live browser so far, so expect a bug or two.
+If you close the tab or browser without solving the challenge, it remains pending.
+
+The next time you visit any supported AI site, the same challenge comes back immediately.
+
+Solving it in one tab also unlocks your other open AI tabs.
+
+## Supported Languages
+
+| Language | Execution |
+| --- | --- |
+| JavaScript | Local browser sandbox / Judge0 fallback |
+| Python | Pyodide / Judge0 fallback |
+| C | Judge0 |
+| C++ | Judge0 |
+| C# | Judge0 |
+| Java | Judge0 |
+
+JavaScript and Python attempt to run locally first.
+
+C, C++, C#, and Java require an internet connection because they are executed through Judge0.
+
+## Offline Python Support
+
+Python can optionally run entirely inside the browser using **Pyodide**.
+
+Download a Pyodide release and copy its files into:
+
+```text
+code-to-chat/
+└── pyodide/
+    ├── pyodide.js
+    ├── pyodide.asm.js
+    ├── pyodide.asm.wasm
+    ├── python_stdlib.zip
+    └── pyodide-lock.json
+```
+
+Then reload the extension.
+
+If the local Pyodide runner is unavailable, Python automatically falls back to Judge0 when an internet connection is available.
+
+## Judge0
+
+C, C++, C#, and Java are executed using the Judge0 server configured in:
+
+```text
+config.js
+```
+
+Because these languages are executed remotely:
+
+- Internet access is required.
+- Submitted code is sent to the configured Judge0 server.
+- Public Judge0 instances may be rate limited.
+
+You can use your own Judge0 instance by changing:
+
+```js
+JUDGE0_URL
+```
+
+in `config.js`.
+
+Remember to add the new server origin to `host_permissions` in `manifest.json`.
+
+## Challenge Scheduling
+
+Challenge behavior can be configured through the `CFG` object near the top of:
+
+```text
+content.js
+```
+
+Available settings include:
+
+| Setting | Purpose |
+| --- | --- |
+| `testMode` | Trigger challenges every visit without cooldown |
+| `chanceOnLoad` | Chance of triggering when opening an AI site |
+| `chanceOnReturn` | Chance of triggering when returning to an existing tab |
+| `loadDelaySec` | Random delay before showing a challenge |
+| `recurMin` | Random interval between challenges |
+| `graceOptionsMin` | Possible cooldown periods after solving |
+
+For normal use, make sure:
+
+```js
+testMode: false
+```
+
+When `testMode` is enabled, challenges intentionally appear much more frequently.
+
+## Persistent Challenges
+
+Once a challenge appears, it is recorded as pending.
+
+If you:
+
+- close the tab
+- close the browser
+- navigate away
+- leave without passing the tests
+
+the challenge remains pending.
+
+The same challenge appears again the next time you open a supported AI website.
+
+It is cleared only after all tests pass.
+
+## Editor
+
+The built-in coding editor includes:
+
+- Line numbers
+- Syntax highlighting
+- Keywords, strings, comments, and numbers
+- Function and type highlighting
+- Compilation errors
+- Runtime errors
+- Error-line highlighting
+
+When possible, the line that caused an error is highlighted in red.
+
+JavaScript syntax errors may not always include accurate line information because of browser sandbox limitations.
+
+## Copy & Paste Protection
+
+While a challenge is active, Code to Chat blocks common ways of copying the problem or pasting a solution.
+
+Blocked interactions include:
+
+- `Ctrl/Cmd + C`
+- `Ctrl/Cmd + V`
+- `Ctrl/Cmd + X`
+- `Ctrl + Insert`
+- `Shift + Insert`
+- `Shift + Delete`
+- Right-click context menu
+- Drag and drop
+- Middle-click paste
+- Text selection
+
+This is designed to discourage casual cheating, not provide foolproof anti-cheat protection.
+
+Users can still disable the extension, use OS-level tools, or manually retype content.
+
+## Adding Challenges
+
+Challenges are defined in:
+
+```text
+challenges.js
+```
+
+Add a new entry to:
+
+```js
+CHALLENGES
+```
+
+Challenges can contain:
+
+- Function-based tests for JavaScript and Python
+- Input/output tests for C, C++, C#, and Java
+
+Challenges are selected randomly while avoiding the immediately previous challenge.
+
+Pull requests adding useful coding challenges are welcome.
+
+## Adding AI Websites
+
+Supported websites are configured in:
+
+```text
+manifest.json
+```
+
+Add the site's URL pattern to the appropriate `matches` lists.
+
+If you add support for another AI platform, consider opening a pull request so everyone can use it.
+
+## Project Structure
+
+```text
+code-to-chat/
+├── assets/
+│   └── code-to-chat.gif
+├── pyodide/             # Optional
+├── challenges.js        # Coding challenges
+├── config.js            # Judge0 configuration
+├── content.js           # Main extension logic
+├── manifest.json        # Extension configuration
+├── README.md
+└── LICENSE
+```
+
+## Contributing
+
+Contributions are welcome.
+
+You can contribute by:
+
+- Adding new coding challenges
+- Supporting more AI websites
+- Fixing bugs
+- Improving browser compatibility
+- Improving the coding editor
+- Improving accessibility
+- Adding local language runners
+- Improving documentation
+
+Fork the repository or clone it:
+
+```bash
+git clone https://github.com/akosimico/code-to-chat.git
+cd code-to-chat
+```
+
+Create a branch:
+
+```bash
+git checkout -b feature/my-change
+```
+
+Make your changes, test the extension locally, commit them, and open a pull request.
+
+## Reporting Issues
+
+Found a bug or have an idea?
+
+Open an issue in the GitHub repository and include, when relevant:
+
+- Browser and version
+- Affected AI website
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+- Screenshots or recordings
+
+## Privacy
+
+Code to Chat does not need to read your AI conversations to generate coding challenges.
+
+However, code executed using a remote Judge0 server is sent to that server for compilation and execution.
+
+JavaScript and Python can execute locally when their local runners are available.
+
+Because this project is open source, you can review `manifest.json`, `config.js`, and the rest of the source code to see exactly what the extension can access.
+
+## Known Limitations
+
+- Code to Chat locks the webpage, not the browser.
+- Users can close tabs or disable the extension.
+- Firefox is not currently supported.
+- Public Judge0 servers may be rate limited.
+- Changes to supported AI websites may occasionally break compatibility.
+- The extension is still being tested across different browsers and environments.
+
+If you encounter a problem, please open an issue.
+
+## License
+
+Licensed under the **MIT License**.
+
+See [`LICENSE`](LICENSE) for details.
+
+## Author
+
+Created by **akosimico**.
+
+GitHub: `@akosimico`
+
+---
+
+**Code less with AI. Forget less how to code.**
