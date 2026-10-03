@@ -2,6 +2,9 @@
 
 Pops a full-screen coding challenge over AI chat sites (ChatGPT, Gemini, Claude, Copilot, Perplexity, Grok, DeepSeek, Poe). The page can't be used until all tests pass.
 
+<img src="assets/code-to-chat.gif" width="500" alt="Code To Chat GIF">
+
+
 ## Install (Chrome, Edge, Brave, Opera)
 
 1. Open the extensions page: `chrome://extensions`, `edge://extensions`, `brave://extensions` or `opera://extensions`.
